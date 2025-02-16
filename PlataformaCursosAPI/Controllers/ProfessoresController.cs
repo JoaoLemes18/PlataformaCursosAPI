@@ -16,18 +16,19 @@ namespace PlataformaCursosAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Professores
+        // GET: api/professores
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Professor>>> GetProfessores()
         {
-            return await _context.Professores.ToListAsync();
+            return await _context.Professores.Include(p => p.Curso).ToListAsync();
         }
 
-        // GET: api/Professores/5
+        // GET: api/professores/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Professor>> GetProfessor(int id)
         {
-            var professor = await _context.Professores.FindAsync(id);
+            var professor = await _context.Professores.Include(p => p.Curso)
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (professor == null)
             {
@@ -37,23 +38,35 @@ namespace PlataformaCursosAPI.Controllers
             return professor;
         }
 
-        // POST: api/Professores
+        // POST: api/professores
         [HttpPost]
         public async Task<ActionResult<Professor>> PostProfessor(Professor professor)
         {
+            var curso = await _context.Cursos.FindAsync(professor.CursoId);
+            if (curso == null)
+            {
+                return BadRequest("Curso não encontrado!");
+            }
+
             _context.Professores.Add(professor);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetProfessor), new { id = professor.Id }, professor);
         }
 
-        // PUT: api/Professores/5
+        // PUT: api/professores/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProfessor(int id, Professor professor)
         {
             if (id != professor.Id)
             {
                 return BadRequest();
+            }
+
+            var curso = await _context.Cursos.FindAsync(professor.CursoId);
+            if (curso == null)
+            {
+                return BadRequest("Curso não encontrado!");
             }
 
             _context.Entry(professor).State = EntityState.Modified;
@@ -77,7 +90,7 @@ namespace PlataformaCursosAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Professores/5
+        // DELETE: api/professores/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProfessor(int id)
         {

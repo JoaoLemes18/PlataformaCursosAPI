@@ -7,35 +7,35 @@
         public required string Descricao { get; set; }
         public int DuracaoEmHoras { get; set; }
 
-        // Lista de alunos e professores associados ao curso
+        //lista de alunos e professores associados ao curso
         public List<Aluno> Alunos { get; set; } = new List<Aluno>();
         public List<Professor> Professores { get; set; } = new List<Professor>();
 
-        // Adiciona um aluno ao curso
+        //adiciona um aluno ao curso
         public void AdicionarAluno(Aluno aluno)
         {
             Alunos.Add(aluno);
         }
 
-        // Adiciona um professor ao curso
+        //adiciona um professor ao curso
         public void AdicionarProfessor(Professor professor)
         {
             Professores.Add(professor);
         }
 
-        // Método para exibir informações do curso
+        //método para exibir informações do curso
         public void ExibirDetalhes()
         {
             Console.WriteLine($"Curso: {Nome}, Descrição: {Descricao}, Duração: {DuracaoEmHoras} horas.");
             Console.WriteLine("Professores do curso:");
             foreach (var professor in Professores)
             {
-                professor.Apresentar(); // Chama o método Apresentar de Professor
+                professor.Apresentar(); //chama o método Apresentar de Professor
             }
             Console.WriteLine("Alunos matriculados:");
             foreach (var aluno in Alunos)
             {
-                aluno.Apresentar(); // Chama o método Apresentar de Aluno
+                aluno.Apresentar(); //chama o método Apresentar de Aluno
             }
         }
     }
