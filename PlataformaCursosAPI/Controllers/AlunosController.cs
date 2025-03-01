@@ -1,65 +1,79 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PlataformaCursosAPI.Models;
-
+using Microsoft.EntityFrameworkCore;
 namespace PlataformaCursosAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class AlunoController : ControllerBase
     {
-        private static List<Aluno> alunos = new List<Aluno>();
+        private readonly Data.ApplicationDbContext _context;
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Aluno>> GetAlunos()
+        public AlunoController(Data.ApplicationDbContext context)
         {
-            return Ok(alunos);
+            _context = context;
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<Aluno> GetAluno(int id)
+        // GET: api/aluno
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Aluno>>> GetAlunos()
         {
-            var aluno = alunos.FirstOrDefault(a => a.Id == id);
+            var aluns = await _context.Alunos.ToListAsync();
+
+            return aluns;
+        }
+
+        // GET: api/aluno/{id}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Aluno>> GetAluno(int id)
+        {
+            var aluno = await _context.Alunos.FindAsync(id);
+
             if (aluno == null)
             {
                 return NotFound();
             }
-            return Ok(aluno);
+
+            return aluno;
         }
 
+        // POST: api/aluno
         [HttpPost]
-        public ActionResult<Aluno> PostAluno([FromBody] Aluno aluno)
+        public async Task<ActionResult<Aluno>> PostAluno(Aluno aluno)
         {
-            aluno.Id = alunos.Count + 1; // Simula a criação de um Id
-            alunos.Add(aluno);
+            _context.Alunos.Add(aluno);
+            await _context.SaveChangesAsync();
+
             return CreatedAtAction(nameof(GetAluno), new { id = aluno.Id }, aluno);
         }
 
+        // PUT: api/aluno/{id}
         [HttpPut("{id}")]
-        public ActionResult PutAluno(int id, [FromBody] Aluno aluno)
+        public async Task<IActionResult> PutAluno(int id, Aluno aluno)
         {
-            var alunoExistente = alunos.FirstOrDefault(a => a.Id == id);
-            if (alunoExistente == null)
+            if (id != aluno.Id)
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            alunoExistente.Nome = aluno.Nome;
-            alunoExistente.Email = aluno.Email;
-            alunoExistente.DataNascimento = aluno.DataNascimento;
+            _context.Entry(aluno).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
+        // DELETE: api/aluno/{id}
         [HttpDelete("{id}")]
-        public ActionResult DeleteAluno(int id)
+        public async Task<IActionResult> DeleteAluno(int id)
         {
-            var aluno = alunos.FirstOrDefault(a => a.Id == id);
+            var aluno = await _context.Alunos.FindAsync(id);
             if (aluno == null)
             {
                 return NotFound();
             }
 
-            alunos.Remove(aluno);
+            _context.Alunos.Remove(aluno);
+            await _context.SaveChangesAsync();
+
             return NoContent();
         }
     }

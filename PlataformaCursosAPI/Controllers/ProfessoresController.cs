@@ -1,34 +1,32 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PlataformaCursosAPI.Data;
-using PlataformaCursosAPI.Models;
-
 namespace PlataformaCursosAPI.Controllers
 {
     [Route("api/[controller]")]
-    [ApiController]
-    public class ProfessoresController : ControllerBase
-    {
-        private readonly AppDbContext _context;
+[ApiController]
 
-        public ProfessoresController(AppDbContext context)
+    public class ProfessorController : ControllerBase
+    {
+        private readonly Data.ApplicationDbContext _context;
+
+        public ProfessorController(Data.ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/professores
+        // GET: api/professor/
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Professor>>> GetProfessores()
         {
-            return await _context.Professores.Include(p => p.Curso).ToListAsync();
+            var profe = await _context.Professores.ToListAsync();
+            return profe;
         }
 
-        // GET: api/professores/5
+        // GET: api/professor/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Professor>> GetProfessor(int id)
         {
-            var professor = await _context.Professores.Include(p => p.Curso)
-                .FirstOrDefaultAsync(p => p.Id == id);
+            var professor = await _context.Professores.FindAsync(id);
 
             if (professor == null)
             {
@@ -38,23 +36,17 @@ namespace PlataformaCursosAPI.Controllers
             return professor;
         }
 
-        // POST: api/professores
+        // POST: api/professor
         [HttpPost]
         public async Task<ActionResult<Professor>> PostProfessor(Professor professor)
         {
-            var curso = await _context.Cursos.FindAsync(professor.CursoId);
-            if (curso == null)
-            {
-                return BadRequest("Curso não encontrado!");
-            }
-
             _context.Professores.Add(professor);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetProfessor), new { id = professor.Id }, professor);
         }
 
-        // PUT: api/professores/5
+        // PUT: api/professor/{id}
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProfessor(int id, Professor professor)
         {
@@ -63,34 +55,13 @@ namespace PlataformaCursosAPI.Controllers
                 return BadRequest();
             }
 
-            var curso = await _context.Cursos.FindAsync(professor.CursoId);
-            if (curso == null)
-            {
-                return BadRequest("Curso não encontrado!");
-            }
-
             _context.Entry(professor).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!_context.Professores.Any(e => e.Id == id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // DELETE: api/professores/5
+        // DELETE: api/professor/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProfessor(int id)
         {
@@ -107,5 +78,3 @@ namespace PlataformaCursosAPI.Controllers
         }
     }
 }
-
-

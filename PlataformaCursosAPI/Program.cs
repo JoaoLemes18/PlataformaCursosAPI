@@ -1,23 +1,35 @@
-using Microsoft.EntityFrameworkCore;
+Ôªøusing Microsoft.EntityFrameworkCore;
 using PlataformaCursosAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Adiciona o DbContext para MySQL
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(8, 0, 30)) // Ajuste para a vers„o do seu MySQL
+        new MySqlServerVersion(new Version(8, 0, 30)) // Ajuste para a vers√£o do seu MySQL
     ));
 
-// Adiciona os serviÁos de controllers e Swagger
+// Adiciona os servi√ßos de controllers e Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-// ConfiguraÁ„o do Swagger
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.AllowAnyOrigin()  // Permite todas as origens
+                                .AllowAnyMethod()
+                                .AllowAnyHeader();
+                      });
+});
+var app = builder.Build(); 
+
+// Configura√ß√£o do Swagger
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -26,7 +38,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseCors(MyAllowSpecificOrigins); 
 app.MapControllers();
 
 app.Run();
-
