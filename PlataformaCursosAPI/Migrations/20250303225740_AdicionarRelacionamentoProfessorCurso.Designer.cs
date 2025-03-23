@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PlataformaCursosAPI.Data;
 
@@ -10,9 +11,11 @@ using PlataformaCursosAPI.Data;
 namespace PlataformaCursosAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250303225740_AdicionarRelacionamentoProfessorCurso")]
+    partial class AdicionarRelacionamentoProfessorCurso
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -57,6 +60,13 @@ namespace PlataformaCursosAPI.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("DuracaoEmHoras")
+                        .HasColumnType("int");
+
                     b.Property<string>("Nome")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -64,6 +74,21 @@ namespace PlataformaCursosAPI.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Cursos");
+                });
+
+            modelBuilder.Entity("PlataformaCursosAPI.Models.ProfessorCurso", b =>
+                {
+                    b.Property<int>("ProfessorId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CursoId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProfessorId", "CursoId");
+
+                    b.HasIndex("CursoId");
+
+                    b.ToTable("ProfessorCursos");
                 });
 
             modelBuilder.Entity("Professor", b =>
@@ -94,22 +119,7 @@ namespace PlataformaCursosAPI.Migrations
                     b.ToTable("Professores");
                 });
 
-            modelBuilder.Entity("ProfessorCurso", b =>
-                {
-                    b.Property<int>("ProfessorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CursoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProfessorId", "CursoId");
-
-                    b.HasIndex("CursoId");
-
-                    b.ToTable("ProfessorCursos");
-                });
-
-            modelBuilder.Entity("ProfessorCurso", b =>
+            modelBuilder.Entity("PlataformaCursosAPI.Models.ProfessorCurso", b =>
                 {
                     b.HasOne("Curso", "Curso")
                         .WithMany("ProfessorCursos")
