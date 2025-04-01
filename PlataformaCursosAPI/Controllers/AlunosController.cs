@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using PlataformaCursosAPI.Models;
+
 namespace PlataformaCursosAPI.Controllers
 {
     [Route("api/[controller]")]
@@ -17,9 +19,8 @@ namespace PlataformaCursosAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Aluno>>> GetAlunos()
         {
-            var aluns = await _context.Alunos.ToListAsync();
-
-            return aluns;
+            var alunos = await _context.Alunos.ToListAsync();
+            return alunos;
         }
 
         // GET: api/aluno/{id}

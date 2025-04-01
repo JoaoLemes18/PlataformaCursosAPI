@@ -1,7 +1,14 @@
-﻿public class Curso
+﻿namespace PlataformaCursosAPI.Models
 {
-    public int Id { get; set; }
-    public string Nome { get; set; }
-    public string Descricao { get; set; }
-    public string DuracaoEmHoras { get; set; } 
+    public class Curso
+    {
+        public int Id { get; set; }
+        public string Nome { get; set; }
+        public string Descricao { get; set; }
+        public string DuracaoEmHoras { get; set; }
+
+  
+                        
+
+    }
 }

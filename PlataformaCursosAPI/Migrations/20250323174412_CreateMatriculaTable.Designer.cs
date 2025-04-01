@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PlataformaCursosAPI.Data;
 
@@ -11,9 +12,11 @@ using PlataformaCursosAPI.Data;
 namespace PlataformaCursosAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250323174412_CreateMatriculaTable")]
+    partial class CreateMatriculaTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,32 +24,6 @@ namespace PlataformaCursosAPI.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
-
-            modelBuilder.Entity("Matricula", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AlunoId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CursoId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DataMatricula")
-                        .HasColumnType("datetime(6)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AlunoId");
-
-                    b.HasIndex("CursoId");
-
-                    b.ToTable("Matriculas");
-                });
 
             modelBuilder.Entity("PlataformaCursosAPI.Models.Aluno", b =>
                 {
@@ -62,6 +39,10 @@ namespace PlataformaCursosAPI.Migrations
 
                     b.Property<int>("Idade")
                         .HasColumnType("int");
+
+                    b.Property<string>("Matricula")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -97,6 +78,36 @@ namespace PlataformaCursosAPI.Migrations
                     b.ToTable("Cursos");
                 });
 
+            modelBuilder.Entity("PlataformaCursosAPI.Models.Matricula", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AlunoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CursoId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DataMatricula")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AlunoId");
+
+                    b.HasIndex("CursoId");
+
+                    b.ToTable("Matriculas");
+                });
+
             modelBuilder.Entity("PlataformaCursosAPI.Models.Professor", b =>
                 {
                     b.Property<int>("Id")
@@ -125,31 +136,16 @@ namespace PlataformaCursosAPI.Migrations
                     b.ToTable("Professores");
                 });
 
-            modelBuilder.Entity("PlataformaCursosAPI.Models.ProfessorCurso", b =>
-                {
-                    b.Property<int>("ProfessorId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CursoId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProfessorId", "CursoId");
-
-                    b.HasIndex("CursoId");
-
-                    b.ToTable("ProfessorCursos");
-                });
-
-            modelBuilder.Entity("Matricula", b =>
+            modelBuilder.Entity("PlataformaCursosAPI.Models.Matricula", b =>
                 {
                     b.HasOne("PlataformaCursosAPI.Models.Aluno", "Aluno")
-                        .WithMany("Matriculas")
+                        .WithMany()
                         .HasForeignKey("AlunoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("PlataformaCursosAPI.Models.Curso", "Curso")
-                        .WithMany("Matriculas")
+                        .WithMany()
                         .HasForeignKey("CursoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -157,42 +153,6 @@ namespace PlataformaCursosAPI.Migrations
                     b.Navigation("Aluno");
 
                     b.Navigation("Curso");
-                });
-
-            modelBuilder.Entity("PlataformaCursosAPI.Models.ProfessorCurso", b =>
-                {
-                    b.HasOne("PlataformaCursosAPI.Models.Curso", "Curso")
-                        .WithMany("ProfessorCursos")
-                        .HasForeignKey("CursoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PlataformaCursosAPI.Models.Professor", "Professor")
-                        .WithMany("ProfessorCursos")
-                        .HasForeignKey("ProfessorId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Curso");
-
-                    b.Navigation("Professor");
-                });
-
-            modelBuilder.Entity("PlataformaCursosAPI.Models.Aluno", b =>
-                {
-                    b.Navigation("Matriculas");
-                });
-
-            modelBuilder.Entity("PlataformaCursosAPI.Models.Curso", b =>
-                {
-                    b.Navigation("Matriculas");
-
-                    b.Navigation("ProfessorCursos");
-                });
-
-            modelBuilder.Entity("PlataformaCursosAPI.Models.Professor", b =>
-                {
-                    b.Navigation("ProfessorCursos");
                 });
 #pragma warning restore 612, 618
         }
