@@ -7,8 +7,5 @@
         public string Descricao { get; set; }
         public string DuracaoEmHoras { get; set; }
 
-  
-                        
-
     }
 }
