@@ -9,8 +9,6 @@ namespace PlataformaCursosAPI.Models
         public string Descricao { get; set; }
         public string DuracaoEmHoras { get; set; }
 
-        [JsonIgnore]
-        public List<Matricula>? Matriculas { get; set; }
 
     }
 }
