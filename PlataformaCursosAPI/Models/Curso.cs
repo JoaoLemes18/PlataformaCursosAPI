@@ -1,4 +1,6 @@
-﻿namespace PlataformaCursosAPI.Models
+﻿using System.Text.Json.Serialization;
+
+namespace PlataformaCursosAPI.Models
 {
     public class Curso
     {
@@ -6,6 +8,9 @@
         public string Nome { get; set; }
         public string Descricao { get; set; }
         public string DuracaoEmHoras { get; set; }
+
+        [JsonIgnore]
+        public List<Matricula>? Matriculas { get; set; }
 
     }
 }
