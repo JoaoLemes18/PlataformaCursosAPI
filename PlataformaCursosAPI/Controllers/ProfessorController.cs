@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlataformaCursosAPI.Models;
+using PlataformaCursosAPI.Data;
 
 namespace PlataformaCursosAPI.Controllers
 {
@@ -8,9 +9,9 @@ namespace PlataformaCursosAPI.Controllers
     [ApiController]
     public class ProfessorController : ControllerBase
     {
-        private readonly Data.ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public ProfessorController(Data.ApplicationDbContext context)
+        public ProfessorController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -19,14 +20,18 @@ namespace PlataformaCursosAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Professor>>> GetProfessores()
         {
-            return await _context.Professores.ToListAsync();
+            return await _context.Professores
+                .Include(p => p.Curso) // Carrega os dados do curso associado
+                .ToListAsync();
         }
 
         // GET: api/professor/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Professor>> GetProfessor(int id)
         {
-            var professor = await _context.Professores.FindAsync(id);
+            var professor = await _context.Professores
+                .Include(p => p.Curso) // Carrega o curso associado ao professor
+                .FirstOrDefaultAsync(p => p.Id == id);
 
             if (professor == null)
             {
@@ -40,6 +45,13 @@ namespace PlataformaCursosAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Professor>> PostProfessor(Professor professor)
         {
+            // Verifica se o CursoId informado existe
+            var cursoExistente = await _context.Cursos.FindAsync(professor.CursoId);
+            if (cursoExistente == null)
+            {
+                return BadRequest("Curso não encontrado.");
+            }
+
             _context.Professores.Add(professor);
             await _context.SaveChangesAsync();
 

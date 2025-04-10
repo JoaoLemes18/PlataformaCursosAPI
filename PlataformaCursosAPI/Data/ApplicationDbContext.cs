@@ -11,6 +11,13 @@ namespace PlataformaCursosAPI.Data
         public DbSet<Professor> Professores { get; set; }
         public DbSet<Curso> Cursos { get; set; }
 
-
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Professor>()
+                .HasOne(p => p.Curso)
+                .WithMany() // Um Curso pode ter vários Professores
+                .HasForeignKey(p => p.CursoId)
+                .OnDelete(DeleteBehavior.Cascade);
+        }
     }
 }

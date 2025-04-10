@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <Compile Remove="Controllers\MatriculaController.cs" />
-    <Compile Remove="Models\Matricula.cs" />
   </ItemGroup>
 
   <ItemGroup>
