@@ -40,8 +40,8 @@ namespace PlataformaCursosAPI.Models
 
     public enum StatusMatricula
     {
-        Ativa = 0,
-        Trancada = 1,
-        Cancelada = 2
+        Ativa = 1,
+        Trancada = 2,
+        Cancelada = 3
     }
 }
