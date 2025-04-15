@@ -24,16 +24,16 @@ namespace PlataformaCursosAPI.Models
         [Required]
         public DateTime DataMatricula { get; set; } = DateTime.Now;
 
-        // Relacionamentos (mas ignorados no Swagger)
         [ForeignKey("AlunoId")]
         [JsonIgnore]
-        [ValidateNever] // ❗ Isso impede que o ASP.NET tente validar Aluno
+        [ValidateNever]
+
 
         public Aluno Aluno { get; set; }
 
         [ForeignKey("CursoId")]
         [JsonIgnore]
-        [ValidateNever] // ❗ Isso impede que o ASP.NET tente validar Aluno
+        [ValidateNever] 
 
         public Curso Curso { get; set; }
     }

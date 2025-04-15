@@ -12,6 +12,8 @@ namespace PlataformaCursosAPI.Data
         public DbSet<Curso> Cursos { get; set; }
         public DbSet<Matricula> Matricula { get; set; }
 
+        public DbSet<Nota> Nota { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Professor>()
