@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlataformaCursosAPI.Models;
+
 namespace PlataformaCursosAPI.Controllers
 {
     [Route("api/[controller]")]

@@ -1,12 +1,37 @@
-﻿namespace PlataformaCursosAPI.Models
-{
-    //classe base para Aluno e Professor
-    public abstract class Pessoa
-    {
-        public required string Nome { get; set; }
-        public int Idade { get; set; }
+﻿using System.ComponentModel.DataAnnotations;
 
-        //método que pode ser sobrescrito
-        public abstract void Apresentar();
+namespace PlataformaCursosAPI.Models
+{
+    public class Pessoa
+    {
+       
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string Nome { get; set; }
+
+        [Required]
+        public string CPF { get; set; }
+
+        [Required]
+        public string Email { get; set; }
+
+        public string Telefone { get; set; }
+
+        [Required]
+        public TipoUsuario TipoUsuario { get; set; }  // Verifique se isso existe na sua classe
+
+        [Required]
+        public string SenhaHash { get; set; }  // Senha armazenada como hash
+    }
+
+    public enum TipoUsuario
+    {
+        Aluno = 1,
+        Professor = 2,
+        Coordenador = 3,
+        Administrativo = 4,
+        Master = 5
     }
 }

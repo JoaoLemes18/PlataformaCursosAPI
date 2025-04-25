@@ -12,8 +12,8 @@ using PlataformaCursosAPI.Data;
 namespace PlataformaCursosAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250415174906_Init")]
-    partial class Init
+    [Migration("20250424040808_AdicionarTipoUsuarioEmPessoa")]
+    partial class AdicionarTipoUsuarioEmPessoa
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,7 +53,7 @@ namespace PlataformaCursosAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Nota");
+                    b.ToTable("Notas");
                 });
 
             modelBuilder.Entity("PlataformaCursosAPI.Models.Aluno", b =>
@@ -64,18 +64,19 @@ namespace PlataformaCursosAPI.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<DateTime>("DataMatricula")
+                        .HasColumnType("datetime(6)");
 
-                    b.Property<int>("Idade")
+                    b.Property<int>("PessoaId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Nome")
+                    b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PessoaId");
 
                     b.ToTable("Alunos");
                 });
@@ -131,7 +132,43 @@ namespace PlataformaCursosAPI.Migrations
 
                     b.HasIndex("CursoId");
 
-                    b.ToTable("Matricula");
+                    b.ToTable("Matriculas");
+                });
+
+            modelBuilder.Entity("PlataformaCursosAPI.Models.Pessoa", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CPF")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("SenhaHash")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Telefone")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("TipoUsuario")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Pessoas");
                 });
 
             modelBuilder.Entity("PlataformaCursosAPI.Models.Professor", b =>
@@ -149,22 +186,27 @@ namespace PlataformaCursosAPI.Migrations
                     b.Property<int>("CursoId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("Idade")
+                    b.Property<int>("PessoaId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Nome")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
                     b.HasIndex("CursoId");
 
+                    b.HasIndex("PessoaId");
+
                     b.ToTable("Professores");
+                });
+
+            modelBuilder.Entity("PlataformaCursosAPI.Models.Aluno", b =>
+                {
+                    b.HasOne("PlataformaCursosAPI.Models.Pessoa", "Pessoa")
+                        .WithMany()
+                        .HasForeignKey("PessoaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Pessoa");
                 });
 
             modelBuilder.Entity("PlataformaCursosAPI.Models.Matricula", b =>
@@ -194,7 +236,15 @@ namespace PlataformaCursosAPI.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("PlataformaCursosAPI.Models.Pessoa", "Pessoa")
+                        .WithMany()
+                        .HasForeignKey("PessoaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Curso");
+
+                    b.Navigation("Pessoa");
                 });
 #pragma warning restore 612, 618
         }

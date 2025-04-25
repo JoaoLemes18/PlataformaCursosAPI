@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using PlataformaCursosAPI.Data;
 using PlataformaCursosAPI.Models;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace PlataformaCursosAPI.Controllers
 {
@@ -15,37 +18,72 @@ namespace PlataformaCursosAPI.Controllers
             _context = context;
         }
 
+        // Criar Nota
         [HttpPost]
-        public IActionResult CriarNota([FromBody] Nota nota)
+        public async Task<IActionResult> CriarNota([FromBody] Nota nota)
         {
-            _context.Nota.Add(nota);
-            _context.SaveChanges();
+            if (nota == null)
+            {
+                return BadRequest("Nota não pode ser nula.");
+            }
+
+            // Verifica se o aluno existe
+            var alunoExistente = await _context.Alunos.FindAsync(nota.AlunoId);
+            if (alunoExistente == null)
+            {
+                return BadRequest("Aluno não encontrado.");
+            }
+
+            // Verifica se o curso existe
+            var cursoExistente = await _context.Cursos.FindAsync(nota.CursoId);
+            if (cursoExistente == null)
+            {
+                return BadRequest("Curso não encontrado.");
+            }
+
+            _context.Notas.Add(nota);
+            await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(ObterPorId), new { id = nota.Id }, nota);
         }
 
+        // Obter Nota por ID
         [HttpGet("{id}")]
-        public IActionResult ObterPorId(int id)
+        public async Task<IActionResult> ObterPorId(int id)
         {
-            var nota = _context.Nota.Find(id);
+            var nota = await _context.Notas.FindAsync(id);
             if (nota == null) return NotFound();
             return Ok(nota);
         }
 
+        // Obter Notas por Aluno
         [HttpGet("aluno/{alunoId}")]
-        public IActionResult ObterPorAluno(int alunoId)
+        public async Task<IActionResult> ObterPorAluno(int alunoId)
         {
-            var notas = _context.Nota
+            var notas = await _context.Notas
                 .Where(n => n.AlunoId == alunoId)
-                .ToList();
+                .ToListAsync();
+
+            if (notas == null || !notas.Any())
+            {
+                return NotFound("Nenhuma nota encontrada para o aluno.");
+            }
+
             return Ok(notas);
         }
 
+        // Obter Notas por Curso
         [HttpGet("curso/{cursoId}")]
-        public IActionResult ObterPorCurso(int cursoId)
+        public async Task<IActionResult> ObterPorCurso(int cursoId)
         {
-            var notas = _context.Nota
+            var notas = await _context.Notas
                 .Where(n => n.CursoId == cursoId)
-                .ToList();
+                .ToListAsync();
+
+            if (notas == null || !notas.Any())
+            {
+                return NotFound("Nenhuma nota encontrada para o curso.");
+            }
+
             return Ok(notas);
         }
     }

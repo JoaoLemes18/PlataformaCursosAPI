@@ -43,7 +43,7 @@ namespace PlataformaCursosAPI.Controllers
                 DataMatricula = DateTime.UtcNow
             };
 
-            _context.Matricula.Add(novaMatricula);
+            _context.Matriculas.Add(novaMatricula);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(ObterMatriculaPorId), new { id = novaMatricula.Id }, novaMatricula);
@@ -53,13 +53,15 @@ namespace PlataformaCursosAPI.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> ObterMatriculaPorId(int id)
         {
-            var matricula = await _context.Matricula
+            var matricula = await _context.Matriculas
+                .Include(m => m.Aluno)  // Carrega a entidade Aluno relacionada
+                .Include(m => m.Curso)  // Carrega a entidade Curso relacionada
                 .Where(m => m.Id == id)
                 .Select(m => new
                 {
                     m.Id,
-                    Aluno = _context.Alunos.Where(a => a.Id == m.AlunoId).Select(a => a.Nome).FirstOrDefault(),
-                    Curso = _context.Cursos.Where(c => c.Id == m.CursoId).Select(c => c.Nome).FirstOrDefault(),
+                    AlunoNome = m.Aluno.Pessoa.Nome,  // Acessa o Nome através da Pessoa
+                    CursoNome = m.Curso.Nome,
                     m.Status,
                     m.DataMatricula
                 })
@@ -75,12 +77,14 @@ namespace PlataformaCursosAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> ListarMatriculas()
         {
-            var matriculas = await _context.Matricula
+            var matriculas = await _context.Matriculas
+                .Include(m => m.Aluno)  // Inclui o Aluno
+                .Include(m => m.Curso)  // Inclui o Curso
                 .Select(m => new
                 {
                     m.Id,
-                    Aluno = _context.Alunos.Where(a => a.Id == m.AlunoId).Select(a => a.Nome).FirstOrDefault(),
-                    Curso = _context.Cursos.Where(c => c.Id == m.CursoId).Select(c => c.Nome).FirstOrDefault(),
+                    AlunoNome = m.Aluno.Pessoa.Nome,  // Acessa o Nome do Aluno através da Pessoa
+                    CursoNome = m.Curso.Nome,
                     m.Status,
                     m.DataMatricula
                 })
@@ -93,11 +97,11 @@ namespace PlataformaCursosAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> ExcluirMatricula(int id)
         {
-            var matricula = await _context.Matricula.FindAsync(id);
+            var matricula = await _context.Matriculas.FindAsync(id);
             if (matricula == null)
                 return NotFound("Matrícula não encontrada.");
 
-            _context.Matricula.Remove(matricula);
+            _context.Matriculas.Remove(matricula);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -111,7 +115,7 @@ namespace PlataformaCursosAPI.Controllers
                 return BadRequest("O ID informado não corresponde ao da matrícula.");
 
             // Verifica se a matrícula existe
-            var matriculaExistente = await _context.Matricula.FindAsync(id);
+            var matriculaExistente = await _context.Matriculas.FindAsync(id);
             if (matriculaExistente == null)
                 return NotFound("Matrícula não encontrada.");
 
@@ -131,7 +135,7 @@ namespace PlataformaCursosAPI.Controllers
             matriculaExistente.Status = matriculaAtualizada.Status;
             matriculaExistente.DataMatricula = matriculaAtualizada.DataMatricula;
 
-            _context.Matricula.Update(matriculaExistente);
+            _context.Matriculas.Update(matriculaExistente);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -147,13 +151,13 @@ namespace PlataformaCursosAPI.Controllers
             if (!Enum.IsDefined(typeof(StatusMatricula), novoStatus))
                 return BadRequest("O status informado não é válido.");
 
-            var matriculaExistente = await _context.Matricula.FindAsync(id);
+            var matriculaExistente = await _context.Matriculas.FindAsync(id);
             if (matriculaExistente == null)
                 return NotFound("Matrícula não encontrada.");
 
             matriculaExistente.Status = (StatusMatricula)novoStatus;
 
-            _context.Matricula.Update(matriculaExistente);
+            _context.Matriculas.Update(matriculaExistente);
             await _context.SaveChangesAsync();
 
             return NoContent();

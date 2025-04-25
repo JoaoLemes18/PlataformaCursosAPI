@@ -7,30 +7,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PlataformaCursosAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "Alunos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Nome = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Email = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Idade = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Alunos", x => x.Id);
-                })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -53,7 +35,7 @@ namespace PlataformaCursosAPI.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Nota",
+                name: "Notas",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -67,36 +49,52 @@ namespace PlataformaCursosAPI.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Nota", x => x.Id);
+                    table.PrimaryKey("PK_Notas", x => x.Id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Matricula",
+                name: "Pessoas",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    AlunoId = table.Column<int>(type: "int", nullable: false),
-                    CursoId = table.Column<int>(type: "int", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    DataMatricula = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    Nome = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CPF = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Email = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Telefone = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Tipo = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Matricula", x => x.Id);
+                    table.PrimaryKey("PK_Pessoas", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Alunos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    PessoaId = table.Column<int>(type: "int", nullable: false),
+                    DataMatricula = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Status = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Alunos", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Matricula_Alunos_AlunoId",
-                        column: x => x.AlunoId,
-                        principalTable: "Alunos",
+                        name: "FK_Alunos_Pessoas_PessoaId",
+                        column: x => x.PessoaId,
+                        principalTable: "Pessoas",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Matricula_Cursos_CursoId",
-                        column: x => x.CursoId,
-                        principalTable: "Cursos",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -106,11 +104,7 @@ namespace PlataformaCursosAPI.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Nome = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Idade = table.Column<int>(type: "int", nullable: false),
-                    Email = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PessoaId = table.Column<int>(type: "int", nullable: false),
                     AreaEspecializacao = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     CursoId = table.Column<int>(type: "int", nullable: false)
@@ -124,33 +118,78 @@ namespace PlataformaCursosAPI.Migrations
                         principalTable: "Cursos",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Professores_Pessoas_PessoaId",
+                        column: x => x.PessoaId,
+                        principalTable: "Pessoas",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Matriculas",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    AlunoId = table.Column<int>(type: "int", nullable: false),
+                    CursoId = table.Column<int>(type: "int", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    DataMatricula = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Matriculas", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Matriculas_Alunos_AlunoId",
+                        column: x => x.AlunoId,
+                        principalTable: "Alunos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Matriculas_Cursos_CursoId",
+                        column: x => x.CursoId,
+                        principalTable: "Cursos",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Matricula_AlunoId",
-                table: "Matricula",
+                name: "IX_Alunos_PessoaId",
+                table: "Alunos",
+                column: "PessoaId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Matriculas_AlunoId",
+                table: "Matriculas",
                 column: "AlunoId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Matricula_CursoId",
-                table: "Matricula",
+                name: "IX_Matriculas_CursoId",
+                table: "Matriculas",
                 column: "CursoId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Professores_CursoId",
                 table: "Professores",
                 column: "CursoId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Professores_PessoaId",
+                table: "Professores",
+                column: "PessoaId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Matricula");
+                name: "Matriculas");
 
             migrationBuilder.DropTable(
-                name: "Nota");
+                name: "Notas");
 
             migrationBuilder.DropTable(
                 name: "Professores");
@@ -160,6 +199,9 @@ namespace PlataformaCursosAPI.Migrations
 
             migrationBuilder.DropTable(
                 name: "Cursos");
+
+            migrationBuilder.DropTable(
+                name: "Pessoas");
         }
     }
 }

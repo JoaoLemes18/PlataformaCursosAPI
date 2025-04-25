@@ -24,20 +24,21 @@ namespace PlataformaCursosAPI.Models
         [Required]
         public DateTime DataMatricula { get; set; } = DateTime.Now;
 
+        // Relações, mas não serializa com JSON
         [ForeignKey("AlunoId")]
         [JsonIgnore]
         [ValidateNever]
-
 
         public Aluno Aluno { get; set; }
 
         [ForeignKey("CursoId")]
         [JsonIgnore]
-        [ValidateNever] 
+        [ValidateNever]
 
         public Curso Curso { get; set; }
     }
 
+    // Enum para status da matrícula
     public enum StatusMatricula
     {
         Ativa = 1,

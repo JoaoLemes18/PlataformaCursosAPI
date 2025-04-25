@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PlataformaCursosAPI.Data;
 
@@ -11,9 +12,11 @@ using PlataformaCursosAPI.Data;
 namespace PlataformaCursosAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250424033331_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,7 +53,7 @@ namespace PlataformaCursosAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Notas", (string)null);
+                    b.ToTable("Notas");
                 });
 
             modelBuilder.Entity("PlataformaCursosAPI.Models.Aluno", b =>
@@ -75,7 +78,7 @@ namespace PlataformaCursosAPI.Migrations
 
                     b.HasIndex("PessoaId");
 
-                    b.ToTable("Alunos", (string)null);
+                    b.ToTable("Alunos");
                 });
 
             modelBuilder.Entity("PlataformaCursosAPI.Models.Curso", b =>
@@ -100,7 +103,7 @@ namespace PlataformaCursosAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cursos", (string)null);
+                    b.ToTable("Cursos");
                 });
 
             modelBuilder.Entity("PlataformaCursosAPI.Models.Matricula", b =>
@@ -129,7 +132,7 @@ namespace PlataformaCursosAPI.Migrations
 
                     b.HasIndex("CursoId");
 
-                    b.ToTable("Matriculas", (string)null);
+                    b.ToTable("Matriculas");
                 });
 
             modelBuilder.Entity("PlataformaCursosAPI.Models.Pessoa", b =>
@@ -152,20 +155,16 @@ namespace PlataformaCursosAPI.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("SenhaHash")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Telefone")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("TipoUsuario")
+                    b.Property<int>("Tipo")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Pessoas", (string)null);
+                    b.ToTable("Pessoas");
                 });
 
             modelBuilder.Entity("PlataformaCursosAPI.Models.Professor", b =>
@@ -192,7 +191,7 @@ namespace PlataformaCursosAPI.Migrations
 
                     b.HasIndex("PessoaId");
 
-                    b.ToTable("Professores", (string)null);
+                    b.ToTable("Professores");
                 });
 
             modelBuilder.Entity("PlataformaCursosAPI.Models.Aluno", b =>

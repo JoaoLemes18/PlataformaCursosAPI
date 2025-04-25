@@ -1,15 +1,25 @@
-﻿namespace PlataformaCursosAPI.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace PlataformaCursosAPI.Models
 {
     public class Professor
     {
+        [Key]
         public int Id { get; set; }
-        public string Nome { get; set; }
-        public int Idade { get; set; }
-        public string Email { get; set; }
+
+        [Required]
+        public int PessoaId { get; set; }
+
         public string AreaEspecializacao { get; set; }
 
-        // Chave estrangeira para Curso
+        [ForeignKey("PessoaId")]
+        public Pessoa Pessoa { get; set; }
+
         public int CursoId { get; set; }
-        public Curso? Curso { get; set; } // Propriedade de navegação
+        public Curso Curso
+        {
+            get; set;
+        }
     }
 }
