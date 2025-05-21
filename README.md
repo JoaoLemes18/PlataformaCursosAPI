@@ -74,9 +74,7 @@ https://localhost:{porta}/swagger
 ## 📝 Estrutura do Projeto
 
 - **Controllers** → Endpoints da API.
-- **Services** → Lógica de negócio.
 - **Models** → Entidades e DTOs.
-- **Repositories** → Acesso a dados.
 - **Middlewares** → Tratamento global, autenticação e autorização.
 
 ---
