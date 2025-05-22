@@ -12,37 +12,35 @@ namespace PlataformaCursosAPI.Models
         public int Id { get; set; }
 
         [Required]
-        public int AlunoId { get; set; }
+        public int PessoaId { get; set; }  // Antes AlunoId
 
         [Required]
-        public int CursoId { get; set; }
+        public int TurmaId { get; set; }
 
         [Required]
         [EnumDataType(typeof(StatusMatricula))]
-        public StatusMatricula Status { get; set; }
+        public StatusMatricula Status { get; set; } = StatusMatricula.Ativa;
 
         [Required]
         public DateTime DataMatricula { get; set; } = DateTime.Now;
 
-        // Relações, mas não serializa com JSON
-        [ForeignKey("AlunoId")]
+        // Relações, ignorando JSON para evitar ciclos
+        [ForeignKey("PessoaId")]
         [JsonIgnore]
         [ValidateNever]
+        public Pessoa Pessoa { get; set; }  // Antes Aluno
 
-        public Aluno Aluno { get; set; }
-
-        [ForeignKey("CursoId")]
+        [ForeignKey("TurmaId")]
         [JsonIgnore]
         [ValidateNever]
+        public Turma Turma { get; set; }
 
-        public Curso Curso { get; set; }
-    }
-
-    // Enum para status da matrícula
-    public enum StatusMatricula
-    {
-        Ativa = 1,
-        Trancada = 2,
-        Cancelada = 3
+        // Enum para status da matrícula
+        public enum StatusMatricula
+        {
+            Ativa = 1,
+            Trancada = 2,
+            Cancelada = 3
+        }
     }
 }

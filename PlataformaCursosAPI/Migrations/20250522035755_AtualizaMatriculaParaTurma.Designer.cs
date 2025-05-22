@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PlataformaCursosAPI.Data;
 
@@ -11,9 +12,11 @@ using PlataformaCursosAPI.Data;
 namespace PlataformaCursosAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250522035755_AtualizaMatriculaParaTurma")]
+    partial class AtualizaMatriculaParaTurma
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,11 +114,11 @@ namespace PlataformaCursosAPI.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("AlunoId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("DataMatricula")
                         .HasColumnType("datetime(6)");
-
-                    b.Property<int>("PessoaId")
-                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -125,7 +128,7 @@ namespace PlataformaCursosAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PessoaId");
+                    b.HasIndex("AlunoId");
 
                     b.HasIndex("TurmaId");
 
@@ -242,9 +245,9 @@ namespace PlataformaCursosAPI.Migrations
 
             modelBuilder.Entity("PlataformaCursosAPI.Models.Matricula", b =>
                 {
-                    b.HasOne("PlataformaCursosAPI.Models.Pessoa", "Pessoa")
+                    b.HasOne("PlataformaCursosAPI.Models.Aluno", "Aluno")
                         .WithMany()
-                        .HasForeignKey("PessoaId")
+                        .HasForeignKey("AlunoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -254,7 +257,7 @@ namespace PlataformaCursosAPI.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Pessoa");
+                    b.Navigation("Aluno");
 
                     b.Navigation("Turma");
                 });

@@ -11,6 +11,7 @@ namespace PlataformaCursosAPI.Data
         public DbSet<Aluno> Alunos { get; set; }
         public DbSet<Professor> Professores { get; set; }
         public DbSet<Curso> Cursos { get; set; }
+        public DbSet<Turma> Turmas { get; set; }       // <-- Adicionado DbSet Turmas
         public DbSet<Matricula> Matriculas { get; set; }
         public DbSet<Nota> Notas { get; set; }
 
@@ -21,21 +22,20 @@ namespace PlataformaCursosAPI.Data
                 .WithMany()
                 .HasForeignKey(p => p.CursoId)
                 .OnDelete(DeleteBehavior.Cascade);
+modelBuilder.Entity<Matricula>()
+    .HasKey(m => m.Id);
 
-            modelBuilder.Entity<Matricula>()
-                .HasKey(m => m.Id);
+modelBuilder.Entity<Matricula>()
+    .HasOne(m => m.Pessoa)      // aqui usa Pessoa, não Aluno
+    .WithMany()                // você pode definir um ICollection<Matricula> na Pessoa se quiser, aí colocaria o nome aqui
+    .HasForeignKey(m => m.PessoaId)
+    .OnDelete(DeleteBehavior.Restrict);
 
-            modelBuilder.Entity<Matricula>()
-                .HasOne(m => m.Aluno)
-                .WithMany()
-                .HasForeignKey(m => m.AlunoId)
-                .OnDelete(DeleteBehavior.Restrict);
-
-            modelBuilder.Entity<Matricula>()
-                .HasOne(m => m.Curso)
-                .WithMany()
-                .HasForeignKey(m => m.CursoId)
-                .OnDelete(DeleteBehavior.Restrict);
+modelBuilder.Entity<Matricula>()
+    .HasOne(m => m.Turma)
+    .WithMany(t => t.Matriculas)
+    .HasForeignKey(m => m.TurmaId)
+    .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Aluno>()
                 .HasOne(a => a.Pessoa)

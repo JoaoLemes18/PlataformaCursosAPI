@@ -1,26 +1,22 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PlataformaCursosAPI.Data;
 using PlataformaCursosAPI.Models;
-using PlataformaCursosAPI.Helpers;
 using PlataformaCursosAPI.DTOs;
 using Microsoft.EntityFrameworkCore;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.Security.Claims;
+using PlataformaCursosAPI.Helpers;
 
 [ApiController]
 [Route("api/[controller]")]
 public class PessoaController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
-    private readonly string _secretKey = "GJ2s2r8A$kL3vWjS8r1+zFg6X9Hj8Pcz2$Psfm7aZ4Z5VvXjH6KwV5yGb8NzHr3O";
 
     public PessoaController(ApplicationDbContext context)
     {
         _context = context;
     }
 
+    // Rota para cadastro de pessoa
     [HttpPost("cadastrar")]
     public async Task<IActionResult> Cadastrar([FromBody] CadastroDto cadastro)
     {
@@ -28,6 +24,14 @@ public class PessoaController : ControllerBase
             return BadRequest("Tipo de usuário inválido.");
 
         var tipoUsuario = (TipoUsuario)cadastro.TipoUsuario;
+
+        var usuarioExistente = await _context.Pessoas
+            .FirstOrDefaultAsync(u => u.Email == cadastro.Email);
+
+        if (usuarioExistente != null)
+        {
+            return BadRequest("Já existe um usuário com esse e-mail.");
+        }
 
         var pessoa = new Pessoa
         {
@@ -46,41 +50,31 @@ public class PessoaController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginDto login)
+    public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
-        var pessoa = await _context.Pessoas
-            .Where(p => p.Email == login.Email)
-            .FirstOrDefaultAsync();
+        var user = await _context.Pessoas
+            .FirstOrDefaultAsync(u => u.Email == loginDto.Email);
 
-        if (pessoa == null || !SenhaHelper.VerificarSenha(login.Senha, pessoa.SenhaHash))
-            return Unauthorized("Email ou senha inválidos.");
-
-        var token = GerarToken(pessoa);
-        return Ok(new { token });
-    }
-
-    private string GerarToken(Pessoa pessoa)
-    {
-        var chaveSecreta = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secretKey));
-        var credenciais = new SigningCredentials(chaveSecreta, SecurityAlgorithms.HmacSha256);
-
-        var claims = new[]
+        if (user == null)
         {
-            new Claim(ClaimTypes.Name, pessoa.Nome),
-            new Claim(ClaimTypes.Email, pessoa.Email),
-            new Claim(ClaimTypes.Role, pessoa.TipoUsuario.ToString())
-        };
+            return Unauthorized("Usuário não encontrado.");
+        }
 
-        var tokenDescriptor = new JwtSecurityToken(
-            issuer: "PlataformaCursosAPI",
-            audience: "PlataformaCursosAPI",
-            claims: claims,
-            expires: DateTime.Now.AddHours(1),
-            signingCredentials: credenciais
-        );
+        bool senhaCorreta = SenhaHelper.VerificarHash(loginDto.Senha, user.SenhaHash);
 
-        return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+        if (!senhaCorreta)
+        {
+            return Unauthorized("Senha inválida.");
+        }
+
+        return Ok(new
+        {
+            Nome = user.Nome,
+            TipoUsuario = user.TipoUsuario
+        });
     }
+
+    // Rota para listar todas as pessoas
     [HttpGet]
     public async Task<IActionResult> ListarPessoas()
     {
@@ -97,5 +91,45 @@ public class PessoaController : ControllerBase
             .ToListAsync();
 
         return Ok(pessoas);
+    }
+
+    // Rota para listar somente alunos
+    [HttpGet("alunos")]
+    public async Task<IActionResult> ListarAlunos()
+    {
+        var alunos = await _context.Pessoas
+            .Where(p => p.TipoUsuario == TipoUsuario.Aluno)
+            .Select(p => new
+            {
+                p.Id,
+                p.Nome,
+                p.CPF,
+                p.Email,
+                p.Telefone,
+                p.TipoUsuario
+            })
+            .ToListAsync();
+
+        return Ok(alunos);
+    }
+
+    // Rota para listar somente professores
+    [HttpGet("professores")]
+    public async Task<IActionResult> ListarProfessores()
+    {
+        var professores = await _context.Pessoas
+            .Where(p => p.TipoUsuario == TipoUsuario.Professor)
+            .Select(p => new
+            {
+                p.Id,
+                p.Nome,
+                p.CPF,
+                p.Email,
+                p.Telefone,
+                p.TipoUsuario
+            })
+            .ToListAsync();
+
+        return Ok(professores);
     }
 }
