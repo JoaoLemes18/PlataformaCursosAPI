@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.OpenApi.Models;
 using PlataformaCursosAPI.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +20,10 @@ builder.Services.AddControllers()
      options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
  });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.OperationFilter<FileUploadOperationFilter>();
+});
 
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
@@ -38,10 +43,23 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "PlataformaCursosAPI v1");
+    });
+
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
+var imagensPath = Path.Combine(builder.Environment.ContentRootPath, "imagens");
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(imagensPath),
+    RequestPath = "/imagens"
+});
 app.UseAuthorization();
 app.UseCors(MyAllowSpecificOrigins); 
 app.MapControllers();
