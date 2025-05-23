@@ -168,5 +168,66 @@ namespace PlataformaCursosAPI.Controllers
 
             return NoContent();
         }
+
+        // 📌 Listar turmas da pessoa (aluno)
+        [HttpGet("pessoa/{pessoaId}/turmas")]
+        public async Task<IActionResult> ListarTurmasDaPessoa(int pessoaId)
+        {
+            // Verifica se a pessoa existe
+            var pessoa = await _context.Pessoas.FindAsync(pessoaId);
+            if (pessoa == null)
+                return NotFound("Pessoa não encontrada.");
+
+            // TipoUsuario = 1 → Aluno
+            if ((int)pessoa.TipoUsuario != 1)
+                return BadRequest("A pessoa informada não é um aluno.");
+
+            // Busca as turmas onde essa pessoa está matriculada
+            var turmas = await _context.Matriculas
+                .Where(m => m.PessoaId == pessoaId)
+                .Select(m => new
+                {
+                    m.Turma.Id,
+                    m.Turma.Nome
+                })
+                .Distinct()
+                .ToListAsync();
+
+            return Ok(turmas);
+        }
+
+        // 📌 Listar materiais da turma para o aluno
+        [HttpGet("pessoa/{pessoaId}/turma/{turmaId}/materiais")]
+        public async Task<IActionResult> ListarMateriaisDaTurmaDoAluno(int pessoaId, int turmaId)
+        {
+            // Verifica se a pessoa existe e é aluno
+            var pessoa = await _context.Pessoas.FindAsync(pessoaId);
+            if (pessoa == null)
+                return NotFound("Pessoa não encontrada.");
+
+            if ((int)pessoa.TipoUsuario != 1) // 1 = Aluno
+                return BadRequest("A pessoa informada não é um aluno.");
+
+            // Verifica se o aluno está matriculado na turma
+            var matriculado = await _context.Matriculas
+                .AnyAsync(m => m.PessoaId == pessoaId && m.TurmaId == turmaId);
+
+            if (!matriculado)
+                return Forbid("Aluno não matriculado nesta turma.");
+
+            // Busca os materiais da turma
+            var materiais = await _context.Materiais
+                .Where(m => m.TurmaId == turmaId)
+                .Select(m => new
+                {
+                    m.Id,
+                    m.Nome,           // nome do material
+                    CaminhoArquivo = m.CaminhoArquivo, // caminho do arquivo
+                    m.DataEnvio
+                })
+                .ToListAsync();
+
+            return Ok(materiais);
+        }
     }
 }

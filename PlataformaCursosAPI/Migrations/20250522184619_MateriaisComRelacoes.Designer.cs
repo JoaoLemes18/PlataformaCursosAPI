@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PlataformaCursosAPI.Data;
 
@@ -11,9 +12,11 @@ using PlataformaCursosAPI.Data;
 namespace PlataformaCursosAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250522184619_MateriaisComRelacoes")]
+    partial class MateriaisComRelacoes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -307,9 +310,9 @@ namespace PlataformaCursosAPI.Migrations
             modelBuilder.Entity("PlataformaCursosAPI.Models.Material", b =>
                 {
                     b.HasOne("PlataformaCursosAPI.Models.Professor", "Professor")
-                        .WithMany()
+                        .WithMany("Materiais")
                         .HasForeignKey("ProfessorId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("PlataformaCursosAPI.Models.Turma", "Turma")
@@ -378,6 +381,11 @@ namespace PlataformaCursosAPI.Migrations
                     b.Navigation("Curso");
 
                     b.Navigation("Professor");
+                });
+
+            modelBuilder.Entity("PlataformaCursosAPI.Models.Professor", b =>
+                {
+                    b.Navigation("Materiais");
                 });
 
             modelBuilder.Entity("PlataformaCursosAPI.Models.Turma", b =>

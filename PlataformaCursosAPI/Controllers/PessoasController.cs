@@ -67,10 +67,18 @@ public class PessoaController : ControllerBase
             return Unauthorized("Senha inválida.");
         }
 
+        // Aqui você busca a matrícula do usuário para pegar a turma
+        var matricula = await _context.Matriculas
+            .Where(m => m.PessoaId == user.Id)
+            .Select(m => m.TurmaId)
+            .FirstOrDefaultAsync();
+
         return Ok(new
         {
+            Id = user.Id,
             Nome = user.Nome,
-            TipoUsuario = user.TipoUsuario
+            TipoUsuario = user.TipoUsuario,
+            TurmaId = matricula  // pode ser 0 se não estiver matriculado em nenhuma turma
         });
     }
 

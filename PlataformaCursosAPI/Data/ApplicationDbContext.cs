@@ -11,6 +11,8 @@ namespace PlataformaCursosAPI.Data
         public DbSet<Aluno> Alunos { get; set; }
         public DbSet<Professor> Professores { get; set; }
         public DbSet<Curso> Cursos { get; set; }
+        public DbSet<Material> Materiais { get; set; }
+
         public DbSet<Turma> Turmas { get; set; }
         public DbSet<Matricula> Matriculas { get; set; }
         public DbSet<Nota> Notas { get; set; }
@@ -49,6 +51,12 @@ namespace PlataformaCursosAPI.Data
                 .HasOne(p => p.Pessoa)
                 .WithMany()
                 .HasForeignKey(p => p.PessoaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Material>()
+                .HasOne(m => m.Turma)
+                .WithMany(t => t.Materiais)
+                .HasForeignKey(m => m.TurmaId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

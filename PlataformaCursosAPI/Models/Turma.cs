@@ -26,6 +26,10 @@ namespace PlataformaCursosAPI.Models
         [JsonIgnore]
         [ValidateNever]
         public ICollection<Matricula> Matriculas { get; set; } = new List<Matricula>();
+        [JsonIgnore]
+        [ValidateNever]
+        public ICollection<Material> Materiais { get; set; }
+
     }
 }
 
