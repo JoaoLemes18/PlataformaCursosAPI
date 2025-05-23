@@ -25,7 +25,7 @@ API desenvolvida em **C# (.NET Core)** para gerenciar uma plataforma de cursos, 
 - C# 12 / .NET 8
 - ASP.NET Core Web API
 - Entity Framework Core
-- SQL Server ou PostgreSQL
+- SQL Server
 - AutoMapper
 - Swagger (OpenAPI)
 ---
@@ -35,7 +35,7 @@ API desenvolvida em **C# (.NET Core)** para gerenciar uma plataforma de cursos, 
 ### ✅ Pré-requisitos
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
-- SQL Server ou PostgreSQL
+- SQL Server 
 - Visual Studio ou VSCode
 - Git
 
