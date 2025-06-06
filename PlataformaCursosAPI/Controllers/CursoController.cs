@@ -4,25 +4,39 @@ using PlataformaCursosAPI.Models;
 
 namespace PlataformaCursosAPI.Controllers
 {
+    /// <summary>
+    /// Controlador para operações relacionadas aos cursos.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class CursoController : ControllerBase
     {
         private readonly Data.ApplicationDbContext _context;
 
+        /// <summary>
+        /// Construtor do CursoController.
+        /// </summary>
+        /// <param name="context">Contexto do banco de dados.</param>
         public CursoController(Data.ApplicationDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/curso
+        /// <summary>
+        /// Retorna a lista de todos os cursos.
+        /// </summary>
+        /// <returns>Lista de cursos.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Curso>>> GetCursos()
         {
             return await _context.Cursos.ToListAsync();
         }
 
-        // GET: api/curso/{id}
+        /// <summary>
+        /// Retorna um curso específico pelo ID.
+        /// </summary>
+        /// <param name="id">ID do curso.</param>
+        /// <returns>Curso correspondente ao ID.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Curso>> GetCurso(int id)
         {
@@ -36,7 +50,11 @@ namespace PlataformaCursosAPI.Controllers
             return curso;
         }
 
-        // POST: api/curso
+        /// <summary>
+        /// Cria um novo curso.
+        /// </summary>
+        /// <param name="curso">Dados do curso a ser criado.</param>
+        /// <returns>Curso criado com sucesso.</returns>
         [HttpPost]
         public async Task<ActionResult<Curso>> PostCurso(Curso curso)
         {
@@ -46,7 +64,12 @@ namespace PlataformaCursosAPI.Controllers
             return CreatedAtAction(nameof(GetCurso), new { id = curso.Id }, curso);
         }
 
-        // PUT: api/curso/{id}
+        /// <summary>
+        /// Atualiza um curso existente.
+        /// </summary>
+        /// <param name="id">ID do curso a ser atualizado.</param>
+        /// <param name="curso">Dados atualizados do curso.</param>
+        /// <returns>Resposta sem conteúdo se a atualização for bem-sucedida.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCurso(int id, Curso curso)
         {
@@ -61,7 +84,11 @@ namespace PlataformaCursosAPI.Controllers
             return NoContent();
         }
 
-        // DELETE: api/curso/{id}
+        /// <summary>
+        /// Exclui um curso pelo ID.
+        /// </summary>
+        /// <param name="id">ID do curso a ser excluído.</param>
+        /// <returns>Resposta sem conteúdo se a exclusão for bem-sucedida.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCurso(int id)
         {

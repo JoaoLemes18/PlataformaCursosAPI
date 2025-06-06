@@ -12,7 +12,7 @@ namespace PlataformaCursosAPI.Models
         public int Id { get; set; }
 
         [Required]
-        public int PessoaId { get; set; }  // Antes AlunoId
+        public int PessoaId { get; set; }  
 
         [Required]
         public int TurmaId { get; set; }
@@ -24,18 +24,16 @@ namespace PlataformaCursosAPI.Models
         [Required]
         public DateTime DataMatricula { get; set; } = DateTime.Now;
 
-        // Relações, ignorando JSON para evitar ciclos
         [ForeignKey("PessoaId")]
         [JsonIgnore]
         [ValidateNever]
-        public Pessoa Pessoa { get; set; }  // Antes Aluno
+        public Pessoa Pessoa { get; set; } 
 
         [ForeignKey("TurmaId")]
         [JsonIgnore]
         [ValidateNever]
         public Turma Turma { get; set; }
 
-        // Enum para status da matrícula
         public enum StatusMatricula
         {
             Ativa = 1,

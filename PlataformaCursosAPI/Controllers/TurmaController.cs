@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/// <summary>
+/// Controller responsável por gerenciar as turmas do sistema.
+/// </summary>
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlataformaCursosAPI.Models;
-using PlataformaCursosAPI.Data; // Ajuste conforme sua pasta de Data (DbContext)
+using PlataformaCursosAPI.Data; 
 
 namespace PlataformaCursosAPI.Controllers
 {
@@ -16,7 +20,10 @@ namespace PlataformaCursosAPI.Controllers
             _context = context;
         }
 
-        // GET api/turma
+        /// <summary>
+        /// Lista todas as turmas cadastradas.
+        /// </summary>
+        /// <returns>Lista de turmas.</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Turma>>> Get()
         {
@@ -24,7 +31,11 @@ namespace PlataformaCursosAPI.Controllers
             return Ok(turmas);
         }
 
-        // GET api/turma/{id}
+        /// <summary>
+        /// Obtém uma turma pelo seu ID.
+        /// </summary>
+        /// <param name="id">ID da turma.</param>
+        /// <returns>Dados da turma ou NotFound.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Turma>> Get(int id)
         {
@@ -34,7 +45,11 @@ namespace PlataformaCursosAPI.Controllers
             return Ok(turma);
         }
 
-        // POST api/turma
+        /// <summary>
+        /// Cria uma nova turma.
+        /// </summary>
+        /// <param name="novaTurma">Objeto Turma com os dados.</param>
+        /// <returns>Turma criada ou erro de validação.</returns>
         [HttpPost]
         public async Task<ActionResult<Turma>> Post([FromBody] Turma novaTurma)
         {
@@ -48,8 +63,12 @@ namespace PlataformaCursosAPI.Controllers
 
             return CreatedAtAction(nameof(Get), new { id = novaTurma.Id }, novaTurma);
         }
-
-        // PUT api/turma/{id}
+        /// <summary>
+        /// Atualiza uma turma existente.
+        /// </summary>
+        /// <param name="id">ID da turma.</param>
+        /// <param name="turmaAtualizada">Dados atualizados da turma.</param>
+        /// <returns>Turma atualizada ou erro.</returns>
         [HttpPut("{id}")]
         public async Task<ActionResult<Turma>> Put(int id, [FromBody] Turma turmaAtualizada)
         {
@@ -69,7 +88,15 @@ namespace PlataformaCursosAPI.Controllers
             return Ok(existingTurma);
         }
 
-        // DELETE api/turma/{id}
+
+        /// <summary>
+        /// Remove uma turma existente pelo seu ID.
+        /// </summary>
+        /// <param name="id">ID da turma a ser removida.</param>
+        /// <returns>
+        /// Retorna NoContent se a exclusão for bem sucedida.
+        /// Retorna NotFound se a turma não for encontrada.
+        /// </returns>
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {

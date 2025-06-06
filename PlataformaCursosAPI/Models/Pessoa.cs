@@ -20,10 +20,10 @@ namespace PlataformaCursosAPI.Models
         public string Telefone { get; set; }
 
         [Required]
-        public TipoUsuario TipoUsuario { get; set; }  // Verifique se isso existe na sua classe
+        public TipoUsuario TipoUsuario { get; set; }  
 
         [Required]
-        public string SenhaHash { get; set; }  // Senha armazenada como hash
+        public string SenhaHash { get; set; } 
     }
 
     public enum TipoUsuario

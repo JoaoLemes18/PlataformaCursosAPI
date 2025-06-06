@@ -15,7 +15,7 @@ namespace PlataformaCursosAPI.Data
 
         public DbSet<Turma> Turmas { get; set; }
         public DbSet<Matricula> Matriculas { get; set; }
-        public DbSet<Nota> Notas { get; set; }
+
         public DbSet<Comunicado> Comunicados { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

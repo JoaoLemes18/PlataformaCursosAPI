@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/// <summary>
+/// Controller responsável por gerenciar as pessoas (usuários) do sistema.
+/// </summary>
+
+using Microsoft.AspNetCore.Mvc;
 using PlataformaCursosAPI.Data;
 using PlataformaCursosAPI.Models;
 using PlataformaCursosAPI.DTOs;
@@ -17,6 +21,11 @@ public class PessoaController : ControllerBase
     }
 
     // Rota para cadastro de pessoa
+    /// <summary>
+    /// Cadastra uma nova pessoa no sistema.
+    /// </summary>
+    /// <param name="cadastro">DTO com dados para cadastro.</param>
+    /// <returns>Mensagem de sucesso ou erro.</returns>
     [HttpPost("cadastrar")]
     public async Task<IActionResult> Cadastrar([FromBody] CadastroDto cadastro)
     {
@@ -49,6 +58,12 @@ public class PessoaController : ControllerBase
         return Ok(new { mensagem = "Cadastro realizado com sucesso." });
     }
 
+
+    /// <summary>
+    /// Realiza login de um usuário.
+    /// </summary>
+    /// <param name="loginDto">DTO contendo Email e Senha.</param>
+    /// <returns>Dados do usuário e turma, ou erro se falha na autenticação.</returns>
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
@@ -101,6 +116,10 @@ public class PessoaController : ControllerBase
         return Ok(pessoas);
     }
 
+    /// <summary>
+    /// Lista somente as pessoas do tipo aluno.
+    /// </summary>
+    /// <returns>Lista de alunos.</returns>
     // Rota para listar somente alunos
     [HttpGet("alunos")]
     public async Task<IActionResult> ListarAlunos()
@@ -121,6 +140,10 @@ public class PessoaController : ControllerBase
         return Ok(alunos);
     }
 
+    /// <summary>
+    /// Lista somente as pessoas do tipo professor.
+    /// </summary>
+    /// <returns>Lista de professores.</returns>
     // Rota para listar somente professores
     [HttpGet("professores")]
     public async Task<IActionResult> ListarProfessores()

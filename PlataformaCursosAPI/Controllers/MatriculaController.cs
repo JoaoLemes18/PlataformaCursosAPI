@@ -1,4 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿/// <summary>
+/// Controller responsável pela gestão das matrículas dos alunos nas turmas.
+/// </summary>
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlataformaCursosAPI.Data;
 using PlataformaCursosAPI.Models;
@@ -18,7 +22,11 @@ namespace PlataformaCursosAPI.Controllers
             _context = context;
         }
 
-        // 📌 Criar uma nova matrícula
+        /// <summary>
+        /// Cria uma nova matrícula para um aluno em uma turma.
+        /// </summary>
+        /// <param name="matricula">Objeto Matricula contendo PessoaId, TurmaId e Status.</param>
+        /// <returns>Retorna Created (201) com os dados da matrícula criada.</returns>
         [HttpPost]
         public async Task<IActionResult> CriarMatricula([FromBody] Matricula matricula)
         {
@@ -52,7 +60,12 @@ namespace PlataformaCursosAPI.Controllers
             return CreatedAtAction(nameof(ObterMatriculaPorId), new { id = novaMatricula.Id }, novaMatricula);
         }
 
-        // 📌 Buscar matrícula por ID
+
+        /// <summary>
+        /// Obtém os dados de uma matrícula específica pelo seu ID.
+        /// </summary>
+        /// <param name="id">ID da matrícula.</param>
+        /// <returns>Retorna os dados da matrícula ou NotFound se não existir.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> ObterMatriculaPorId(int id)
         {
@@ -78,7 +91,11 @@ namespace PlataformaCursosAPI.Controllers
             return Ok(matricula);
         }
 
-        // 📌 Listar todas as matrículas
+
+        /// <summary>
+        /// Lista todas as matrículas cadastradas.
+        /// </summary>
+        /// <returns>Retorna uma lista com todas as matrículas e seus detalhes.</returns>
         [HttpGet]
         public async Task<IActionResult> ListarMatriculas()
         {
@@ -100,7 +117,11 @@ namespace PlataformaCursosAPI.Controllers
             return Ok(matriculas);
         }
 
-        // 📌 Excluir matrícula
+        /// <summary>
+        /// Exclui uma matrícula pelo seu ID.
+        /// </summary>
+        /// <param name="id">ID da matrícula a ser excluída.</param>
+        /// <returns>Retorna NoContent (204) se excluído com sucesso ou NotFound.</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> ExcluirMatricula(int id)
         {
@@ -114,7 +135,13 @@ namespace PlataformaCursosAPI.Controllers
             return NoContent();
         }
 
-        // 📌 Atualizar matrícula completa
+
+        /// <summary>
+        /// Atualiza completamente os dados de uma matrícula existente.
+        /// </summary>
+        /// <param name="id">ID da matrícula a ser atualizada.</param>
+        /// <param name="matriculaAtualizada">Objeto Matricula com os novos dados.</param>
+        /// <returns>Retorna NoContent (204) se atualizado com sucesso, BadRequest ou NotFound em casos de erro.</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> AtualizarMatriculaCompleta(int id, [FromBody] Matricula matriculaAtualizada)
         {
@@ -147,7 +174,12 @@ namespace PlataformaCursosAPI.Controllers
             return NoContent();
         }
 
-        // 📌 Atualizar apenas o status da matrícula
+        /// <summary>
+        /// Atualiza somente o status de uma matrícula existente.
+        /// </summary>
+        /// <param name="id">ID da matrícula.</param>
+        /// <param name="dados">JSON contendo o campo "status" com o novo status.</param>
+        /// <returns>Retorna NoContent (204) se atualizado com sucesso, BadRequest ou NotFound em casos de erro.</returns>
         [HttpPatch("{id}/status")]
         public async Task<IActionResult> AtualizarStatusMatricula(int id, [FromBody] JsonElement dados)
         {
@@ -169,7 +201,12 @@ namespace PlataformaCursosAPI.Controllers
             return NoContent();
         }
 
-        // 📌 Listar turmas da pessoa (aluno)
+
+        /// <summary>
+        /// Lista as turmas em que uma pessoa (aluno) está matriculada.
+        /// </summary>
+        /// <param name="pessoaId">ID da pessoa (deve ser aluno).</param>
+        /// <returns>Retorna lista de turmas ou erro caso pessoa não exista ou não seja aluno.</returns>
         [HttpGet("pessoa/{pessoaId}/turmas")]
         public async Task<IActionResult> ListarTurmasDaPessoa(int pessoaId)
         {
@@ -196,8 +233,18 @@ namespace PlataformaCursosAPI.Controllers
             return Ok(turmas);
         }
 
-        // 📌 Listar materiais da turma para o aluno
-        [HttpGet("pessoa/{pessoaId}/turma/{turmaId}/materiais")]
+/// <summary>
+/// Lista os materiais disponíveis de uma turma específica para um aluno específico.
+/// </summary>
+/// <param name="pessoaId">ID da pessoa (aluno).</param>
+/// <param name="turmaId">ID da turma.</param>
+/// <returns>
+/// Retorna a lista de materiais da turma se o aluno estiver matriculado.
+/// Retorna NotFound se a pessoa não existir.
+/// Retorna BadRequest se a pessoa não for do tipo aluno.
+/// Retorna Forbid se o aluno não estiver matriculado na turma.
+/// </returns>        
+[HttpGet("pessoa/{pessoaId}/turma/{turmaId}/materiais")]
         public async Task<IActionResult> ListarMateriaisDaTurmaDoAluno(int pessoaId, int turmaId)
         {
             // Verifica se a pessoa existe e é aluno

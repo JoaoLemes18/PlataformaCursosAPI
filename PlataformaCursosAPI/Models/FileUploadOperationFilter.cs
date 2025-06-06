@@ -10,7 +10,6 @@ public class FileUploadOperationFilter : IOperationFilter
     {
         var parameters = context.MethodInfo.GetParameters();
 
-        // Verifica se há algum parâmetro IFormFile
         if (!parameters.Any(p => p.ParameterType == typeof(IFormFile)))
         {
             return;

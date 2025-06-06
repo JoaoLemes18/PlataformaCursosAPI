@@ -11,7 +11,6 @@ namespace PlataformaCursosAPI.Models
         public string Descricao { get; set; }
         public int Capacidade { get; set; } = 8;
 
-        // Relações
         public int CursoId { get; set; }
 
         [JsonIgnore]
