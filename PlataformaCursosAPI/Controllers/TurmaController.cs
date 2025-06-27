@@ -5,7 +5,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PlataformaCursosAPI.Models;
-using PlataformaCursosAPI.Data; 
+using PlataformaCursosAPI.Data;
 
 namespace PlataformaCursosAPI.Controllers
 {
@@ -23,19 +23,28 @@ namespace PlataformaCursosAPI.Controllers
         /// <summary>
         /// Lista todas as turmas cadastradas.
         /// </summary>
-        /// <returns>Lista de turmas.</returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Turma>>> Get()
+        public async Task<IActionResult> GetTurmas()
         {
-            var turmas = await _context.Turmas.ToListAsync();
+            var turmas = await _context.Turmas
+                .Include(t => t.Matriculas)
+                .Select(t => new
+                {
+                    t.Id,
+                    t.Nome,
+                    t.Capacidade,
+                    t.CursoId,
+                    Matriculados = t.Matriculas.Count()
+                })
+                .ToListAsync();
+
             return Ok(turmas);
         }
+
 
         /// <summary>
         /// Obtém uma turma pelo seu ID.
         /// </summary>
-        /// <param name="id">ID da turma.</param>
-        /// <returns>Dados da turma ou NotFound.</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<Turma>> Get(int id)
         {
@@ -48,8 +57,6 @@ namespace PlataformaCursosAPI.Controllers
         /// <summary>
         /// Cria uma nova turma.
         /// </summary>
-        /// <param name="novaTurma">Objeto Turma com os dados.</param>
-        /// <returns>Turma criada ou erro de validação.</returns>
         [HttpPost]
         public async Task<ActionResult<Turma>> Post([FromBody] Turma novaTurma)
         {
@@ -58,17 +65,19 @@ namespace PlataformaCursosAPI.Controllers
                 return BadRequest("Nome, CursoId e ProfessorId são obrigatórios.");
             }
 
+            // Define capacidade máxima de 8 alunos
+            if (novaTurma.Capacidade > 8)
+                novaTurma.Capacidade = 8;
+
             _context.Turmas.Add(novaTurma);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(Get), new { id = novaTurma.Id }, novaTurma);
         }
+
         /// <summary>
         /// Atualiza uma turma existente.
         /// </summary>
-        /// <param name="id">ID da turma.</param>
-        /// <param name="turmaAtualizada">Dados atualizados da turma.</param>
-        /// <returns>Turma atualizada ou erro.</returns>
         [HttpPut("{id}")]
         public async Task<ActionResult<Turma>> Put(int id, [FromBody] Turma turmaAtualizada)
         {
@@ -78,7 +87,11 @@ namespace PlataformaCursosAPI.Controllers
 
             existingTurma.Nome = turmaAtualizada.Nome ?? existingTurma.Nome;
             existingTurma.Descricao = turmaAtualizada.Descricao ?? existingTurma.Descricao;
-            existingTurma.Capacidade = turmaAtualizada.Capacidade != 0 ? turmaAtualizada.Capacidade : existingTurma.Capacidade;
+
+            // Aplica capacidade máxima de 8 alunos
+            if (turmaAtualizada.Capacidade != 0)
+                existingTurma.Capacidade = turmaAtualizada.Capacidade > 8 ? 8 : turmaAtualizada.Capacidade;
+
             existingTurma.CursoId = turmaAtualizada.CursoId != 0 ? turmaAtualizada.CursoId : existingTurma.CursoId;
             existingTurma.ProfessorId = turmaAtualizada.ProfessorId != 0 ? turmaAtualizada.ProfessorId : existingTurma.ProfessorId;
 
@@ -88,15 +101,9 @@ namespace PlataformaCursosAPI.Controllers
             return Ok(existingTurma);
         }
 
-
         /// <summary>
         /// Remove uma turma existente pelo seu ID.
         /// </summary>
-        /// <param name="id">ID da turma a ser removida.</param>
-        /// <returns>
-        /// Retorna NoContent se a exclusão for bem sucedida.
-        /// Retorna NotFound se a turma não for encontrada.
-        /// </returns>
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(int id)
         {

@@ -34,7 +34,8 @@ namespace PlataformaCursosAPI.Controllers
                 return BadRequest(ModelState);
 
             // Verifica se a pessoa existe e é do tipo Aluno (TipoUsuario = 1)
-            var alunoExiste = await _context.Pessoas.AnyAsync(p => p.Id == matricula.PessoaId && p.TipoUsuario == TipoUsuario.Aluno);
+            var alunoExiste = await _context.Pessoas
+                .AnyAsync(p => p.Id == matricula.PessoaId && p.TipoUsuario == TipoUsuario.Aluno);
 
             if (!alunoExiste)
                 return BadRequest("O aluno informado não existe.");
@@ -43,8 +44,16 @@ namespace PlataformaCursosAPI.Controllers
             var turma = await _context.Turmas
                 .Include(t => t.Curso)
                 .FirstOrDefaultAsync(t => t.Id == matricula.TurmaId);
+
             if (turma == null)
                 return BadRequest("A turma informada não existe.");
+
+            // Verifica se o aluno já está matriculado nesta turma
+            var matriculaExistente = await _context.Matriculas
+                .AnyAsync(m => m.PessoaId == matricula.PessoaId && m.TurmaId == matricula.TurmaId);
+
+            if (matriculaExistente)
+                return BadRequest("O aluno já está matriculado nesta turma.");
 
             var novaMatricula = new Matricula
             {

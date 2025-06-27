@@ -3,11 +3,12 @@
 /// </summary>
 
 using Microsoft.AspNetCore.Mvc;
-using PlataformaCursosAPI.Data;
-using PlataformaCursosAPI.Models;
-using PlataformaCursosAPI.DTOs;
 using Microsoft.EntityFrameworkCore;
+using PlataformaCursosAPI.Data;
+using PlataformaCursosAPI.DTOs;
 using PlataformaCursosAPI.Helpers;
+using PlataformaCursosAPI.Models;
+using static PlataformaCursosAPI.Models.Matricula;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -20,12 +21,9 @@ public class PessoaController : ControllerBase
         _context = context;
     }
 
-    // Rota para cadastro de pessoa
     /// <summary>
     /// Cadastra uma nova pessoa no sistema.
     /// </summary>
-    /// <param name="cadastro">DTO com dados para cadastro.</param>
-    /// <returns>Mensagem de sucesso ou erro.</returns>
     [HttpPost("cadastrar")]
     public async Task<IActionResult> Cadastrar([FromBody] CadastroDto cadastro)
     {
@@ -58,12 +56,9 @@ public class PessoaController : ControllerBase
         return Ok(new { mensagem = "Cadastro realizado com sucesso." });
     }
 
-
     /// <summary>
     /// Realiza login de um usuário.
     /// </summary>
-    /// <param name="loginDto">DTO contendo Email e Senha.</param>
-    /// <returns>Dados do usuário e turma, ou erro se falha na autenticação.</returns>
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto loginDto)
     {
@@ -82,7 +77,6 @@ public class PessoaController : ControllerBase
             return Unauthorized("Senha inválida.");
         }
 
-        // Aqui você busca a matrícula do usuário para pegar a turma
         var matricula = await _context.Matriculas
             .Where(m => m.PessoaId == user.Id)
             .Select(m => m.TurmaId)
@@ -93,11 +87,13 @@ public class PessoaController : ControllerBase
             Id = user.Id,
             Nome = user.Nome,
             TipoUsuario = user.TipoUsuario,
-            TurmaId = matricula  // pode ser 0 se não estiver matriculado em nenhuma turma
+            TurmaId = matricula
         });
     }
 
-    // Rota para listar todas as pessoas
+    /// <summary>
+    /// Lista todas as pessoas.
+    /// </summary>
     [HttpGet]
     public async Task<IActionResult> ListarPessoas()
     {
@@ -117,10 +113,8 @@ public class PessoaController : ControllerBase
     }
 
     /// <summary>
-    /// Lista somente as pessoas do tipo aluno.
+    /// Lista somente alunos.
     /// </summary>
-    /// <returns>Lista de alunos.</returns>
-    // Rota para listar somente alunos
     [HttpGet("alunos")]
     public async Task<IActionResult> ListarAlunos()
     {
@@ -141,10 +135,8 @@ public class PessoaController : ControllerBase
     }
 
     /// <summary>
-    /// Lista somente as pessoas do tipo professor.
+    /// Lista somente professores.
     /// </summary>
-    /// <returns>Lista de professores.</returns>
-    // Rota para listar somente professores
     [HttpGet("professores")]
     public async Task<IActionResult> ListarProfessores()
     {
@@ -163,4 +155,83 @@ public class PessoaController : ControllerBase
 
         return Ok(professores);
     }
+
+    /// <summary>
+    /// Atualiza os dados de uma pessoa existente.
+    /// </summary>
+    [HttpPut("{id}")]
+    public async Task<IActionResult> EditarPessoa(int id, [FromBody] PessoaEdicaoDto dto)
+    {
+        var pessoa = await _context.Pessoas.FindAsync(id);
+        if (pessoa == null)
+            return NotFound("Pessoa não encontrada.");
+
+        pessoa.Nome = dto.Nome ?? pessoa.Nome;
+        pessoa.CPF = dto.CPF ?? pessoa.CPF;
+        pessoa.Email = dto.Email ?? pessoa.Email;
+        pessoa.Telefone = dto.Telefone ?? pessoa.Telefone;
+        pessoa.TipoUsuario = (TipoUsuario)dto.TipoUsuario;
+
+        if (!string.IsNullOrEmpty(dto.Senha))
+        {
+            pessoa.SenhaHash = SenhaHelper.GerarHash(dto.Senha);
+        }
+
+        await _context.SaveChangesAsync();
+        return Ok(new { mensagem = "Pessoa atualizada com sucesso." });
+    }
+
+    /// <summary>
+    /// Exclui uma pessoa pelo seu ID, removendo também matrículas e vínculos de professor/aluno se existirem.
+    /// </summary>
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> ExcluirPessoa(int id)
+    {
+        var pessoa = await _context.Pessoas.FindAsync(id);
+        if (pessoa == null)
+            return NotFound("Pessoa não encontrada.");
+
+        // ✅ Cancelar matrículas vinculadas antes
+        var matriculas = await _context.Matriculas
+            .Where(m => m.PessoaId == id)
+            .ToListAsync();
+
+        if (matriculas.Any())
+        {
+            foreach (var matricula in matriculas)
+            {
+                // Cancela a matrícula ao invés de excluir diretamente
+                matricula.Status = StatusMatricula.Cancelada;
+            }
+            _context.Matriculas.UpdateRange(matriculas);
+        }
+
+        // ✅ Remove registro de Professor se existir
+        var professor = await _context.Professores
+            .FirstOrDefaultAsync(p => p.PessoaId == id);
+        if (professor != null)
+        {
+            _context.Professores.Remove(professor);
+        }
+
+        // ✅ Remove registro de Aluno se existir
+        var aluno = await _context.Alunos
+            .FirstOrDefaultAsync(a => a.PessoaId == id);
+        if (aluno != null)
+        {
+            _context.Alunos.Remove(aluno);
+        }
+
+        // ✅ Salva alterações intermediárias (matrículas/professor/aluno)
+        await _context.SaveChangesAsync();
+
+        // ✅ Exclui a pessoa após desvincular tudo
+        _context.Pessoas.Remove(pessoa);
+        await _context.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+
+
 }
